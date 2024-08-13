@@ -1,0 +1,20 @@
+[
+    {
+        "Id": 3328,
+        "Name": "\u0420\u0438\u0441",
+        "Price": 58.0,
+        "Count": 1.0,
+        "IsWeight": true,
+        "Completed": false,
+        "Category": "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u044b\u0435"
+    },
+    {
+        "Id": 2091,
+        "Name": "\u0413\u0440\u0435\u0447\u043a\u0430",
+        "Price": 60.0,
+        "Count": 2.0,
+        "IsWeight": true,
+        "Completed": false,
+        "Category": "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u044b\u0435"
+    }
+]
