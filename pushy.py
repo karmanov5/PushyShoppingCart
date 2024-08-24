@@ -6,7 +6,7 @@ import json
 class PushyAPI:
 
     @staticmethod
-    def sendPushNotification(title, message, data, to, options):
+    def sendPushNotification(title, message, data, to : list, options):
         
         api_key = '295b5fff86dcfa091f47a7bff44c40665af2ec1c35f46f56bba89ca22bc98236'
         url = 'https://api.pushy.me/push?api_key=' + api_key

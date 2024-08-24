@@ -15,7 +15,9 @@ class server:
 
     def __init__(self, port: int) -> None:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.address = socket.gethostbyname(socket.gethostname())
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.address = socket.gethostbyname(socket.gethostname())
+        self.address = '193.168.3.49'
         self.port = port
         self.socket.bind((self.address, self.port))
         self.__working = True
@@ -31,13 +33,16 @@ class server:
         self.__products = []
         if os.path.exists('products.json'):
             with open("products.json", 'r', encoding='utf-8') as file:
-                self.__products = json.load(file, object_hook=lambda obj: product(id=obj['Id'],
+                temp = json.load(file, object_hook=lambda obj: product(id=obj['Id'],
                                                                                     name=obj['Name'],
                                                                                     price=obj['Price'],
                                                                                     count=obj['Count'],
                                                                                     isWeight=obj['IsWeight'],
                                                                                     completed=obj['Completed'],
                                                                                     category=obj['Category']))
+                self.__products = temp
+
+
     def __save_products(self):
         with open('products.json', 'w', encoding='utf-8') as file:
             json.dump(self.__products, file, cls=productEncoder, indent=4)
@@ -141,8 +146,10 @@ class server:
             if _category not in self.__categories:
                 self.__categories.append(_category)
                 self.__save_categories()
-            title, message = "Добавлена новая категория продуктов!", f"Добавлена категория {_category}"
-            send_data['data'] = _category
+                title, message = "Добавлена новая категория продуктов!", f"Добавлена категория {_category}"
+                send_data['data'] = _category
+            else:
+                return
 
         elif command == "remove_product":
             _product = json_data['data']
@@ -185,24 +192,28 @@ class server:
         elif command == 'change_product':
             _product = json_data['data']
             oldName = ''
+            oldCategory = ''
             for p in self.__products:
                 if p.Id == _product['Id']:
                     oldName = p.Name
+                    oldCategory = p.Category
                     p.Name = _product['Name']
-                    p.set_price(_product['Price'])
-                    p.set_count(_product['Count'])
+                    p.Price = _product['Price']
+                    p.Count = _product['Count']
                     p.IsWeight = _product['IsWeight']
+                    p.Category = _product['Category']
                     break
             self.__save_products()
             title, message = f"Изменен товар в {_product['Category']}!", f"Проверьте список, в нем поменялся {oldName}"
             send_data['data'] = _product
+            send_data['old_group'] = oldCategory
         
         elif command == 'complete_product':
             _product = json_data['data']
             for p in self.__products:
                 if p.Name == _product['Name'] and p.Id == _product['Id']:
                     send_data['category'] = p.Category
-                    p.set_complete(True)
+                    p.Completed = True
                     _product['Completed'] = True
                     _product['Category'] = p.Category = 'Завершенные'
                     break
@@ -219,6 +230,6 @@ class server:
             send_data['data'] = __user
         
         _data = dict(data=json.dumps(send_data, ensure_ascii=False, indent=4, cls=productEncoder))
-        for _cl in self.__clients:
-            PushyAPI.sendPushNotification(title, message, _data, _cl.id, None)
+        PushyAPI.sendPushNotification(title, message, _data, [_cl.id for _cl in self.__clients], None)
+        
         
