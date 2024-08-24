@@ -17,7 +17,7 @@ class server:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # self.address = socket.gethostbyname(socket.gethostname())
-        self.address = '193.168.3.49'
+        self.address = '85.192.60.245'
         self.port = port
         self.socket.bind((self.address, self.port))
         self.__working = True
